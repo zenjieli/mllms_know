@@ -2,17 +2,21 @@
   <h2 align="center" style="margin-top: -10px;">MLLMs Know Where to Look: <br>Training-free Perception of Small Visual Details with Multimodal LLMs</h2>
 </p>
 
-<p align="center">
-  <img src="images/method_case.png" alt="Geoperception" width="600">
-</p>
-
-
 <div style="font-family: charter;" align="center">
     <a href="https://saccharomycetes.github.io/" target="_blank">Jiarui Zhang</a>,
     <a href="https://mahyarkoy.github.io/" target="_blank">Mahyar Khayatkhoei</a>,
     <a href="https://www.prateekchhikara.com/" target="_blank">Prateek Chhikara</a>,
     <a href="https://www.ilievski.info/" target="_blank">Filip Ilievski</a>
 </div>
+
+<br>
+
+<p align="center">
+  <img src="images/method_case.png" alt="Geoperception" width="600">
+</p>
+
+
+
 
 Code for the ICLR 2025 Paper "[MLLMs Know Where to Look: Training-free Perception of Small Visual Details with Multimodal LLMs](https://arxiv.org/abs/2412.08737)".
 
