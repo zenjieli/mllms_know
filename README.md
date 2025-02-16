@@ -1,5 +1,5 @@
 <p align="center">
-  <h2 align="center" style="margin-top: -10px;">MLLMs Know Where to Look: <br>Training-free Perception of Small Visual Details with Multimodal LLMs</h2>
+  <h2 align="center" style="margin-top: -30px;">MLLMs Know Where to Look: <br>Training-free Perception of Small Visual Details with Multimodal LLMs</h2>
 </p>
 
 <div style="font-family: charter;" align="center">
