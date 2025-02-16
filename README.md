@@ -46,12 +46,12 @@ bash run_all.sh textvqa llava rel_att
 
 ## Citation
 
-If you find Euclid useful for your research and applications, please cite using this BibTeX:
+If you find our paper and code useful for your research and applications, please cite using this BibTeX:
 ```bibtex 
-@article{zhang2024euclid,
-  title={Euclid: Supercharging Multimodal LLMs with Synthetic High-Fidelity Visual Descriptions},
-  author={Zhang, Jiarui and Liu, Ollie and Yu, Tianyu and Hu, Jinyi and Neiswanger, Willie},
-  journal={arXiv preprint arXiv:2412.08737},
-  year={2024}
+@inproceedings{zhang2025mllms_know,
+  title={MLLMs Know Where to Look: Training-free Perception of Small Visual Details with Multimodal LLMs},
+  author={Zhang, Jiarui and Khayatkhoei, Mahyar and Chhikara, Prateek and Ilievski, Filip},
+  booktitle={ICLR 2025},
+  year={2025}
 }
 ```
