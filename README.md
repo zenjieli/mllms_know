@@ -18,7 +18,9 @@
 
 
 
-Code for the ICLR 2025 Paper "[MLLMs Know Where to Look: Training-free Perception of Small Visual Details with Multimodal LLMs](https://openreview.net/forum?id=DgaY5mDdmT)".
+Code for the ICLR 2025 Paper "MLLMs Know Where to Look: Training-free Perception of Small Visual Details with Multimodal LLMs".
+
+[Arxiv](https://arxiv.org/abs/2502.17422) | [OpenReview](https://openreview.net/forum?id=DgaY5mDdmT)
 
 
 ## Environment Setup
