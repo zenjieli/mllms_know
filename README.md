@@ -48,6 +48,13 @@ bash run_all.sh textvqa llava rel_att
 
 If you find our paper and code useful for your research and applications, please cite using this BibTeX:
 ```bibtex 
+@article{zhang2025mllms,
+  title={MLLMs Know Where to Look: Training-free Perception of Small Visual Details with Multimodal LLMs}, 
+  author={Jiarui Zhang and Mahyar Khayatkhoei and Prateek Chhikara and Filip Ilievski},
+  journal={arXiv preprint arXiv:2502.17422},
+  year={2025}
+}
+
 @inproceedings{
 zhang2025mllms,
 title={{MLLM}s Know Where to Look: Training-free Perception of Small Visual Details with Multimodal {LLM}s},
