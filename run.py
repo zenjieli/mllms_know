@@ -14,6 +14,28 @@ from utils import *
 from info import *
 
 def vicrop_qa(model_name, method_name, image_path, question, model, processor, short_question):
+    """
+    Performs visual cropping and question answering using different attention methods.
+    
+    This function processes an image with a specified model (LLaVA or BLIP) and attention method,
+    generates an attention map, crops the image based on the attention, and then performs
+    question answering on both the original and cropped images.
+    
+    Args:
+        model_name: String indicating which model to use ("llava" or "blip")
+        method_name: String indicating which attention method to use (e.g., "grad_att", "rel_att", "pure_grad")
+        image_path: Path to the input image file
+        question: The full question to ask about the image
+        model: The loaded model instance (LLaVA or BLIP)
+        processor: The processor for the corresponding model
+        short_question: A shortened version of the question for attention computation
+        
+    Returns:
+        tuple: (original_answer, cropped_answer, bounding_box)
+            - original_answer: Model's answer using the full image
+            - cropped_answer: Model's answer using the cropped image
+            - bounding_box: The coordinates of the crop (left, top, right, bottom)
+    """
 
     if model_name == "llava":
         bbox_size = 336
@@ -124,6 +146,29 @@ def vicrop_qa(model_name, method_name, image_path, question, model, processor, s
         return ori_generation, multi_generation, bbox
 
 def main(args):
+    """
+    Main function to run the visual cropping and question answering pipeline.
+    
+    This function loads the specified model and processor, processes the dataset,
+    applies the visual cropping and question answering to each data point,
+    and saves the results to a JSON file.
+    
+    Args:
+        args: An argparse.Namespace object containing the following attributes:
+            - model: String indicating which model to use ("llava" or "blip")
+            - model_id: The model identifier for loading from HuggingFace
+            - device: The device to run the model on ("cuda" or "cpu")
+            - question_path: Path to the question dataset
+            - image_path: Path to the directory containing images
+            - task: The task identifier
+            - method: The attention method to use
+            - output_path: Path to save the results
+            - total_chunks: Total number of chunks to split the dataset into
+            - chunk_id: The ID of the current chunk to process
+            
+    Returns:
+        None: Results are saved to the specified output file
+    """
 
     if args.model == 'llava':
         model = LlavaForConditionalGeneration.from_pretrained(args.model_id, torch_dtype=torch.bfloat16, low_cpu_mem_usage=True, attn_implementation="eager").to(args.device)

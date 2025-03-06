@@ -15,6 +15,24 @@ QFORMER_LAYER = 2
 LM_LAYER = 15
 
 def gradient_attention_blip(image, prompt, general_prompt, model, processor):
+    """
+    Generates an attention map using gradient-weighted attention from BLIP model.
+    
+    This function computes attention maps from both the Query Former and Language Model
+    components of BLIP, weights them by their gradients with respect to the loss,
+    and combines them to create a final attention map highlighting regions relevant to the prompt.
+    
+    Args:
+        image: Input image to analyze
+        prompt: Text prompt for which to generate attention
+        general_prompt: General text prompt (not directly used in this function)
+        model: BLIP model instance
+        processor: BLIP processor for preparing inputs
+        
+    Returns:
+        att_map: A 2D numpy array of shape (NUM_PATCHES, NUM_PATCHES) representing 
+                the gradient-weighted attention map
+    """
 
     # Prepare inputs
     inputs = processor(images=image, text=prompt, return_tensors="pt", padding=True).to(model.device, torch.bfloat16)
@@ -53,6 +71,23 @@ def gradient_attention_blip(image, prompt, general_prompt, model, processor):
     return att_map
 
 def rel_attention_blip(image, prompt, general_prompt, model, processor):
+    """
+    Generates a relative attention map by comparing specific prompt attention to general prompt attention.
+    
+    This function computes attention maps for both a specific prompt and a general prompt,
+    then calculates their ratio to highlight regions that are uniquely relevant to the specific prompt.
+    
+    Args:
+        image: Input image to analyze
+        prompt: Specific text prompt for which to generate attention
+        general_prompt: General text prompt for baseline comparison
+        model: BLIP model instance
+        processor: BLIP processor for preparing inputs
+        
+    Returns:
+        att_map: A 2D numpy array of shape (NUM_PATCHES, NUM_PATCHES) representing 
+                the relative attention map (specific/general)
+    """
     # Prepare inputs
     inputs = processor(images=image, text=prompt, return_tensors="pt", padding=True).to(model.device, torch.bfloat16)
     general_inputs = processor(images=image, text=general_prompt, return_tensors="pt", padding=True).to(model.device, torch.bfloat16)
@@ -88,6 +123,24 @@ def rel_attention_blip(image, prompt, general_prompt, model, processor):
     return att_map
 
 def pure_gradient_blip(image, prompt, general_prompt, model, processor):
+    """
+    Generates a gradient-based attention map using direct image gradients.
+    
+    This function computes gradients of the loss with respect to the input image pixels
+    for both specific and general prompts. It then calculates their ratio and applies
+    a high-pass filter to highlight fine-grained details that are uniquely relevant to the specific prompt.
+    
+    Args:
+        image: Input image to analyze
+        prompt: Specific text prompt for which to generate gradients
+        general_prompt: General text prompt for baseline comparison
+        model: BLIP model instance
+        processor: BLIP processor for preparing inputs
+        
+    Returns:
+        grad: A 2D numpy array representing the processed gradient map highlighting
+              regions relevant to the specific prompt
+    """
     # Process inputs
     inputs = processor(images=image, text=prompt, return_tensors="pt", padding=True).to(model.device, torch.bfloat16)
     general_inputs = processor(images=image, text=general_prompt, return_tensors="pt", padding=True).to(model.device, torch.bfloat16)

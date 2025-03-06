@@ -14,6 +14,24 @@ IMAGE_TOKEN_INDEX = 32000
 ATT_LAYER = 14
 
 def gradient_attention_llava(image, prompt, general_prompt, model, processor):
+    """
+    Generates an attention map using gradient-weighted attention from LLaVA model.
+    
+    This function computes attention maps from the LLaVA model and weights them by their
+    gradients with respect to the loss. It focuses on the attention paid to image tokens
+    in the final token prediction, highlighting regions relevant to the prompt.
+    
+    Args:
+        image: Input image to analyze
+        prompt: Text prompt for which to generate attention
+        general_prompt: General text prompt (not directly used in this function)
+        model: LLaVA model instance
+        processor: LLaVA processor for preparing inputs
+        
+    Returns:
+        att_map: A 2D numpy array of shape (NUM_PATCHES, NUM_PATCHES) representing 
+                the gradient-weighted attention map
+    """
     # Prepare inputs
     inputs = processor(prompt, image, return_tensors="pt", padding=True).to(model.device, torch.bfloat16)
     pos = inputs['input_ids'][0].tolist().index(IMAGE_TOKEN_INDEX)
@@ -36,7 +54,24 @@ def gradient_attention_llava(image, prompt, general_prompt, model, processor):
     return att_map
 
 def rel_attention_llava(image, prompt, general_prompt, model, processor):
-
+    """
+    Generates a relative attention map by comparing specific prompt attention to general prompt attention.
+    
+    This function computes attention maps for both a specific prompt and a general prompt in the LLaVA model,
+    then calculates their ratio to highlight regions that are uniquely relevant to the specific prompt.
+    It focuses on the attention paid to image tokens in the final token prediction.
+    
+    Args:
+        image: Input image to analyze
+        prompt: Specific text prompt for which to generate attention
+        general_prompt: General text prompt for baseline comparison
+        model: LLaVA model instance
+        processor: LLaVA processor for preparing inputs
+        
+    Returns:
+        att_map: A 2D numpy array of shape (NUM_PATCHES, NUM_PATCHES) representing 
+                the relative attention map (specific/general)
+    """
     # Prepare inputs for the prompt
     inputs = processor(prompt, image, return_tensors="pt", padding=True).to(model.device, torch.bfloat16)
     pos = inputs['input_ids'][0].tolist().index(IMAGE_TOKEN_INDEX)
@@ -56,6 +91,24 @@ def rel_attention_llava(image, prompt, general_prompt, model, processor):
     return att_map
 
 def pure_gradient_llava(image, prompt, general_prompt, model, processor):
+    """
+    Generates a gradient-based attention map using direct image gradients in LLaVA.
+    
+    This function computes gradients of the loss with respect to the input image pixels
+    for both specific and general prompts. It then calculates their ratio and applies
+    a high-pass filter to highlight fine-grained details that are uniquely relevant to the specific prompt.
+    
+    Args:
+        image: Input image to analyze
+        prompt: Specific text prompt for which to generate gradients
+        general_prompt: General text prompt for baseline comparison
+        model: LLaVA model instance
+        processor: LLaVA processor for preparing inputs
+        
+    Returns:
+        grad: A 2D numpy array representing the processed gradient map highlighting
+              regions relevant to the specific prompt
+    """
     # Process inputs
     inputs = processor(prompt, image, return_tensors="pt", padding=True).to(model.device, torch.bfloat16)
     general_inputs = processor(general_prompt, image, return_tensors="pt", padding=True).to(model.device, torch.bfloat16)

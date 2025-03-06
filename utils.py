@@ -6,6 +6,22 @@ from skimage.measure import block_reduce
 
 
 def high_pass_filter(image, resolusion, km=7, kh=3, reduce=True):
+    """
+    Applies a high-pass filter to an image to highlight edges and fine details.
+    
+    This function resizes the image, applies a Gaussian blur to create a low-frequency version,
+    subtracts it from the original to get high-frequency components, and then applies median filtering.
+    
+    Args:
+        image: Input PIL image
+        resolusion: Target resolution to resize the image to
+        km: Kernel size for median filtering (default: 7)
+        kh: Kernel size for Gaussian blur (default: 3)
+        reduce: Whether to reduce the output size using block reduction (default: True)
+        
+    Returns:
+        h_brightness: A 2D numpy array representing the high-frequency components of the image
+    """
 
     image = TF.resize(image, (resolusion, resolusion))
     image = TF.to_tensor(image).unsqueeze(0)
@@ -19,6 +35,21 @@ def high_pass_filter(image, resolusion, km=7, kh=3, reduce=True):
     return h_brightness
 
 def bbox_from_att_image_adaptive(att_map, image_size, bbox_size=336):
+    """
+    Generates an adaptive bounding box from an attention map.
+    
+    This function finds the region with the highest attention in the attention map
+    and creates a bounding box around it. It tries different crop ratios and selects
+    the one that produces the sharpest attention difference.
+    
+    Args:
+        att_map: A 2D numpy array representing the attention map (e.g., 24x24 for LLaVA or 16x16 for BLIP)
+        image_size: Tuple of (width, height) of the original image
+        bbox_size: Base size for the bounding box (default: 336)
+        
+    Returns:
+        tuple: (x1, y1, x2, y2) coordinates of the bounding box in the original image
+    """
     # att_map: a numpy array with size of 24*24 (LLaVA) or 16*16 (BLIP)
     # image_size: the size of the original image
     # bbox_size: the size of the crop image
@@ -92,6 +123,22 @@ def bbox_from_att_image_adaptive(att_map, image_size, bbox_size=336):
     return x1, y1, x2, y2
 
 def high_res_split_threshold(image, res_threshold=1024):
+    """
+    Splits a high-resolution image into smaller patches.
+    
+    This function divides a large image into smaller patches to process them individually,
+    which is useful for handling high-resolution images that might be too large for direct processing.
+    
+    Args:
+        image: Input PIL image
+        res_threshold: Maximum resolution threshold before splitting (default: 1024)
+        
+    Returns:
+        tuple: (split_images, vertical_split, horizontal_split)
+            - split_images: List of PIL image patches
+            - vertical_split: Number of vertical splits
+            - horizontal_split: Number of horizontal splits
+    """
 
     vertical_split = int(np.ceil(image.size[1] / res_threshold))
     horizontal_split = int(vertical_split * image.size[0] / image.size[1])
@@ -108,6 +155,24 @@ def high_res_split_threshold(image, res_threshold=1024):
     return split_images, vertical_split, horizontal_split
 
 def high_res(map_func, image, prompt, general_prompt, model, processor):
+    """
+    Applies an attention mapping function to high-resolution images by splitting and recombining.
+    
+    This function splits a high-resolution image into smaller patches, applies the specified
+    attention mapping function to each patch, and then recombines the results into a single
+    attention map.
+    
+    Args:
+        map_func: The attention mapping function to apply to each patch
+        image: Input PIL image
+        prompt: Text prompt for the attention function
+        general_prompt: General text prompt for baseline comparison
+        model: Model instance (LLaVA or BLIP)
+        processor: Processor for the corresponding model
+        
+    Returns:
+        block_att: A 2D numpy array representing the combined attention map for the entire image
+    """
 
     split_images, num_vertical_split, num_horizontal_split = high_res_split_threshold(image)
     att_maps = []
@@ -121,6 +186,24 @@ def high_res(map_func, image, prompt, general_prompt, model, processor):
 
 
 def process_data(data_name, data_list, image_path):
+    """
+    Processes dataset-specific data into a standardized format.
+    
+    This function takes raw data from various datasets (TextVQA, VQAv2, GQA, etc.)
+    and converts it into a standardized list of dictionaries with consistent keys.
+    
+    Args:
+        data_name: String indicating which dataset is being processed
+        data_list: List of raw data entries from the dataset
+        image_path: Base path to the directory containing images
+        
+    Returns:
+        data: List of dictionaries with standardized format:
+            [
+                {'image_path': path_to_image, 'question': question_text, 'label': answer_labels, ...},
+                ...
+            ]
+    """
     
     # load the raw json data then process into a list of dictionaries
     # [
