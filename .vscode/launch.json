@@ -1,0 +1,40 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "justMyCode": false
+        },
+        {
+            "name": "Test Qwen-VL",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "custom/qwen_test.py",
+            "justMyCode": false
+        },
+        {
+            "name": "Eval LLaVA",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "eval/eval.py",
+            "args": [
+                "--chunk_id",
+                "0",
+                "--total_chunks",
+                "1",
+                "--model",
+                "llava",
+                "--task",
+                "textvqa",
+                "--method",
+                "rel_att"
+            ]
+        }
+    ]
+}
