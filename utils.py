@@ -36,7 +36,7 @@ def high_pass_filter(image, resolusion, km=7, kh=3, reduce=True):
 
 def bbox_from_att_image_adaptive(att_map, image_size, bbox_size=336):
     """
-    Generates an adaptive bounding box from an attention map.
+    Generates an adaptive bounding box for original image from an attention map.
     
     This function finds the region with the highest attention in the attention map
     and creates a bounding box around it. It tries different crop ratios and selects
@@ -50,9 +50,6 @@ def bbox_from_att_image_adaptive(att_map, image_size, bbox_size=336):
     Returns:
         tuple: (x1, y1, x2, y2) coordinates of the bounding box in the original image
     """
-    # att_map: a numpy array with size of 24*24 (LLaVA) or 16*16 (BLIP)
-    # image_size: the size of the original image
-    # bbox_size: the size of the crop image
 
     # the ratios corresponds to the bounding box we are going to crop the image
     ratios = [1, 1.2, 1.4, 1.6, 1.8, 2]
@@ -67,7 +64,7 @@ def bbox_from_att_image_adaptive(att_map, image_size, bbox_size=336):
         # the size of each block in the attention map, in the original image
         block_size = image_size[0] / att_map.shape[1], image_size[1] / att_map.shape[0]
 
-        # if I want a bbox_size*r width and bbox_size*r height crop from the original image, how many blocks do I need? (x, y)
+        # if I want a bbox_size*r width and bbox_size*r height crop from the original image, the number of blocks I need (x, y)
         block_num = min(int(bbox_size*ratio/block_size[0]), att_map.shape[1]), min(int(bbox_size*ratio/block_size[1]), att_map.shape[0])
         if att_map.shape[1]-block_num[0] < 1 and att_map.shape[0]-block_num[1] < 1:
             if ratio == 1:
@@ -80,6 +77,7 @@ def bbox_from_att_image_adaptive(att_map, image_size, bbox_size=336):
         sliding_att = np.zeros((att_map.shape[0]-block_num[1]+1, att_map.shape[1]-block_num[0]+1))
         max_att = -np.inf
         max_att_pos = (0, 0)
+
         # sliding window to find the block with the highest attention
         for x in range(att_map.shape[1]-block_num[0]+1): 
             for y in range(att_map.shape[0]-block_num[1]+1): 
@@ -183,84 +181,3 @@ def high_res(map_func, image, prompt, general_prompt, model, processor):
     block_att = np.block([att_maps[j:j+num_horizontal_split] for j in range(0, num_horizontal_split * num_vertical_split, num_horizontal_split)])
 
     return block_att
-
-
-def process_data(data_name, data_list, image_path):
-    """
-    Processes dataset-specific data into a standardized format.
-    
-    This function takes raw data from various datasets (TextVQA, VQAv2, GQA, etc.)
-    and converts it into a standardized list of dictionaries with consistent keys.
-    
-    Args:
-        data_name: String indicating which dataset is being processed
-        data_list: List of raw data entries from the dataset
-        image_path: Base path to the directory containing images
-        
-    Returns:
-        data: List of dictionaries with standardized format:
-            [
-                {'image_path': path_to_image, 'question': question_text, 'label': answer_labels, ...},
-                ...
-            ]
-    """
-    
-    # load the raw json data then process into a list of dictionaries
-    # [
-    #    { 'image_path': image_path, 'question': 'question string', },
-    #    ...    
-    # ]
-    data = []
-    if data_name == 'textvqa':
-        for d in data_list:
-            data.append({
-                'image_path': os.path.join(image_path, d['image_id'] + '.jpg'),
-                'question': d['question'],
-                'label': d['answers'],
-            })
-    elif data_name == 'vqav2':
-        for d in data_list:
-            data.append({
-                'image_path': os.path.join(image_path, f'COCO_val2014_{str(d["image_id"]).zfill(12)}.jpg'),
-                'question': d['question'],
-                'label': d['answers'],
-            })
-    elif data_name == 'gqa':
-        for d in data_list:
-            data.append({
-                'image_path': os.path.join(image_path, d['image_id'] + '.jpg'),
-                'question': d['question'],
-                'label': d['answers'],
-            })
-    elif data_name == 'aokvqa':
-        for d in data_list:
-            data.append({
-                'image_path': os.path.join(image_path, f'COCO_val2014_{str(d["image_id"]).zfill(12)}.jpg'),
-                'question': d['question'],
-                'label': d['answers'],
-            })
-    elif data_name == 'vstar':
-        for d in data_list:
-            data.append({
-                'image_path': os.path.join(image_path, d['image']),
-                'question': d['text'],
-                'label': d['label'],
-                'short_question': d['text'].split('\n')[0],
-            })
-    elif data_name == 'docvqa':
-        data_list = data_list['data']
-        for d in data_list:
-            data.append({
-                'image_path': os.path.join(image_path, d['image']),
-                'question': d['question'],
-                'label': d['answers'],
-            })
-    elif data_name == 'pope':
-        for d in data_list:
-            data.append({
-                'image_path': os.path.join(image_path, d['image']),
-                'question': d['text'],
-                'label': d['label'],
-            })
-    
-    return data

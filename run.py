@@ -28,12 +28,12 @@ def vicrop_qa(model_name, method_name, image_path, question, model, processor, s
         question: The full question to ask about the image
         model: The loaded model instance (LLaVA or BLIP)
         processor: The processor for the corresponding model
-        short_question: A shortened version of the question for attention computation
+        short_question: A shortened version of the question for attention computation (only used in Vstar)
         
     Returns:
         tuple: (original_answer, cropped_answer, bounding_box)
             - original_answer: Model's answer using the full image
-            - cropped_answer: Model's answer using the cropped image
+            - cropped_answer: Model's answer using the full image and the cropped image
             - bounding_box: The coordinates of the crop (left, top, right, bottom)
     """
 
@@ -183,7 +183,8 @@ def main(args):
     else:
         whole_data = list(load_dataset(args.question_path)['test'])
     
-    whole_data = process_data(args.task, whole_data, args.image_path)
+    for data in whole_data:
+        data["image_path"] = os.path.join(args.image_path, data["image_path"])
 
     splited_data = np.array_split(whole_data, args.total_chunks)
 
@@ -208,6 +209,10 @@ def main(args):
 
         new_datas.append(d)
 
+    out_put_dir = os.path.dirname(args.output_path)
+    if not os.path.exists(out_put_dir):
+        os.makedirs(out_put_dir)
+
     if os.path.exists(args.output_path):
         with open(args.output_path, "r") as f:
             old_datas = json.load(f)
@@ -230,6 +235,8 @@ if __name__ == "__main__":
     args.device = "cuda" if torch.cuda.is_available() else "cpu"
 
     output_name = f'{args.model}-{args.task}-{args.method}.json'
+
+    args.model_id = model_to_fullname[args.model]
 
     args.output_path = os.path.join(args.save_path, output_name)
 

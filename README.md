@@ -21,20 +21,9 @@
 
 ## 📋 Overview
 
-This repository contains the official implementation of our ICLR 2025 paper "MLLMs Know Where to Look: Training-free Perception of Small Visual Details with Multimodal LLMs". Our method enables multimodal large language models (MLLMs) to better perceive small visual details without any additional training.
-
-### Key Features:
-- Training-free approach to enhance MLLMs' perception of small visual details
-- Implementation of various attention and gradient-based methods
-- Support for multiple MLLMs including LLaVA-1.5 and InstructBLIP
-- Evaluation on multiple benchmark datasets (TextVQA, DocVQA, GQA, etc.)
-- Visualization tools for attention/gradient maps
+This repository contains the official implementation of our ICLR 2025 paper "MLLMs Know Where to Look: Training-free Perception of Small Visual Details with Multimodal LLMs". Our method enables multimodal large language models (MLLMs) to better perceive small visual details without any additional training. This repository provides the detailed implementation of applying our methods on multiple MLLMs and benchmark datasets. 
 
 ## 🛠️ Installation
-
-### Prerequisites
-- Python 3.10
-- CUDA-compatible GPU (recommended)
 
 ### Setup Environment
 ```bash
@@ -56,8 +45,7 @@ cd ..
 We provide a [quick start notebook](quick_start.ipynb) that demonstrates how to:
 - Load and process images
 - Apply our methods to enhance visual perception
-- Visualize attention/gradient maps
-- Interpret model outputs
+- Visualize attention maps
 
 ## 📊 Benchmark Evaluation
 
@@ -65,13 +53,56 @@ We provide a [quick start notebook](quick_start.ipynb) that demonstrates how to:
 1. Download the benchmark datasets and corresponding images to your local directory
 2. Update the paths in `info.py` with your local directory paths
 
+Example (textvqa)
+
+Dataset preparation:
+```bash
+mkdir -p data/textvqa/images
+wget https://dl.fbaipublicfiles.com/textvqa/images/train_val_images.zip -P data/textvqa/images
+unzip data/textvqa/images/train_val_images.zip -d data/textvqa/images
+rm data/textvqa/images/train_val_images.zip
+mv data/textvqa/images/train_images/* data/textvqa/images
+rm -r data/textvqa/images/train_images
+wget https://dl.fbaipublicfiles.com/textvqa/data/TextVQA_0.5.1_val.json -P data/textvqa
+```
+
+Dataset processing (to a unified format):
+```python
+import json
+
+with open('data/textvqa/TextVQA_0.5.1_val.json') as f:
+    datas = json.load(f)
+
+new_datas = []
+for data_id, data in enumerate(datas['data']):
+    data_id = str(data_id).zfill(10)
+    question = data['question']
+    labels = data['answers']
+    image_path = f"{data['image_id']}.jpg"
+    new_data = {
+        'id': data_id,
+        'question': question,
+        'labels': labels,
+        'image_path': image_path
+    }
+    new_datas.append(new_data)
+
+with open('data/textvqa/data.json', 'w') as f:
+    json.dump(new_datas, f, indent=4)
+```
+
+
 ### Running Evaluations
 To run our method on benchmark datasets, use the provided script:
 
 ```bash
 # Format: bash run_all.sh [dataset] [model] [method]
-# Example: Run relative attention method with LLaVA-1.5 on TextVQA
 bash run_all.sh textvqa llava rel_att
+```
+
+Get the model's performance:
+```bash
+python get_score.py --data_dir ./data/results --save_path ./
 ```
 
 ### Supported Datasets
@@ -87,11 +118,7 @@ bash run_all.sh textvqa llava rel_att
 - LLaVA-1.5 (`llava`)
 - InstructBLIP (`blip`)
 
-### Supported Methods
-- Relative Attention (`rel_att`)
-- Gradient Attention (`grad_att`)
-- High-Resolution Gradient Attention (`grad_att_high`)
-- And more (see implementation files)
+For implementation details, see `llava_methods.py` and `blip_methods.py`. Please feel free to explore other MLLMs!
 
 ## 📝 Method Details
 
@@ -105,7 +132,7 @@ For implementation details, see `llava_methods.py` and `blip_methods.py`.
 
 ## 📊 Results
 
-Our method significantly improves MLLMs' performance on tasks requiring perception of small visual details, such as text recognition in images, fine-grained object recognition, and spatial reasoning.
+Our method significantly improves MLLMs' performance on tasks requiring perception of small visual details, such as text recognition in images, fine-grained object recognition, and spatial reasoning. Please refer to the [paper](https://arxiv.org/abs/2502.17422) for more details and run the demo notebook for better understanding!
 
 ## 📚 Citation
 
@@ -119,11 +146,11 @@ If you find our paper and code useful for your research and applications, please
 }
 
 @inproceedings{zhang2025mllms,
-title={{MLLM}s Know Where to Look: Training-free Perception of Small Visual Details with Multimodal {LLM}s},
-author={Jiarui Zhang and Mahyar Khayatkhoei and Prateek Chhikara and Filip Ilievski},
-booktitle={The Thirteenth International Conference on Learning Representations},
-year={2025},
-url={https://openreview.net/forum?id=DgaY5mDdmT}
+  title={{MLLM}s Know Where to Look: Training-free Perception of Small Visual Details with Multimodal {LLM}s},
+  author={Jiarui Zhang and Mahyar Khayatkhoei and Prateek Chhikara and Filip Ilievski},
+  booktitle={The Thirteenth International Conference on Learning Representations},
+  year={2025},
+  url={https://openreview.net/forum?id=DgaY5mDdmT}
 }
 ```
 

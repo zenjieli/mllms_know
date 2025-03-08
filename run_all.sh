@@ -15,7 +15,7 @@ for ((i=0; i<num_gpus; i++)); do
 done
 
 for i in "${!gpus[@]}"; do
-  command="CUDA_VISIBLE_DEVICES=${gpus[$i]} python eval/eval.py --chunk_id ${parts[$i]} --total_chunks $num_gpus --model $model --task $task --method $method"
+  command="CUDA_VISIBLE_DEVICES=${gpus[$i]} python run.py --chunk_id ${parts[$i]} --total_chunks $num_gpus --model $model --task $task --method $method"
   echo "Executing: $command"
   eval $command &
   sleep 10
