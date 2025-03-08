@@ -105,16 +105,16 @@ Get the model's performance:
 python get_score.py --data_dir ./data/results --save_path ./
 ```
 
-### Supported Datasets
-- TextVQA
-- DocVQA
-- GQA
-- AOKVQA
-- POPE
-- VSTAR
-- VQAv2
+### Datasets Links
+- [TextVQA](https://textvqa.org/dataset/)
+- [DocVQA](https://rrc.cvc.uab.es/?ch=17&com=downloads) (Task 1)
+- [GQA](https://cs.stanford.edu/people/dorarad/gqa/download.html)
+- [AOKVQA](https://github.com/allenai/aokvqa?tab=readme-ov-file#downloading-the-dataset)
+- [POPE](https://huggingface.co/datasets/lmms-lab/POPE)
+- [VSTAR](https://huggingface.co/datasets/craigwu/vstar_bench)
+- [VQAv2](https://visualqa.org/download.html)
 
-### Supported Models
+### Models
 - LLaVA-1.5 (`llava`)
 - InstructBLIP (`blip`)
 
@@ -122,13 +122,23 @@ For implementation details, see `llava_methods.py` and `blip_methods.py`. Please
 
 ## 📝 Method Details
 
-Our approach leverages the inherent attention mechanisms and gradients within MLLMs to identify regions of interest in images without requiring additional training. The key methods include:
+Our approach leverages inherent attention mechanisms and gradients in MLLMs to identify regions of interest without additional training. The key methods include:
 
-1. **Relative Attention**: Compares attention patterns between task-specific and general prompts
-2. **Gradient Attention**: Uses gradient information to identify important image regions
-3. **High-Resolution Processing**: Enhances detail perception through multi-scale processing
+1. **Relative Attention-based Visual Cropping**: Computes relative attention \(A_{rel}(x,q)\) for each image-question pair and selects a target layer from TextVQA validation data to guide visual cropping.
 
-For implementation details, see `llava_methods.py` and `blip_methods.py`.
+2. **Gradient-Weighted Attention-based Visual Cropping**: Uses gradient information to refine attention maps, normalizing answer-to-token and token-to-image attention without requiring a second forward pass.
+
+3. **Input Gradient-based Visual Cropping**: Directly computes the gradient of the model’s decision w.r.t. the input image. To mitigate noise in uniform regions, it applies Gaussian high-pass filtering, median filtering, and thresholding before spatial aggregation.
+
+
+**Bounding Box Selection for Visual Cropping.**  
+We use a sliding window approach to extract bounding boxes from the importance map. Windows of different sizes, scaled by factors in $\{1, 1.2, \dots, 2\}$, slide over the image with a stride of 1. The position maximizing the sum of importance values is selected, and the window with the largest deviation from its neighbors is chosen. The cropped region is then resized and fed into the MLLM.
+
+**High-Resolution Visual Cropping.**  
+For high-resolution images ($>1K$), we first split them into smaller non-overlapping blocks ($<1024\times1024$), compute importance maps for each block, and merge them. The same bounding box selection is then applied to the merged importance map.
+
+
+For implementation details, see `llava_methods.py` and `blip_methods.py` and `utils.py`.
 
 ## 📊 Results
 
