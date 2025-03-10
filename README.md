@@ -23,6 +23,12 @@
 
 This repository contains the official implementation of our ICLR 2025 paper "MLLMs Know Where to Look: Training-free Perception of Small Visual Details with Multimodal LLMs". Our method enables multimodal large language models (MLLMs) to better perceive small visual details without any additional training. This repository provides the detailed implementation of applying our methods on multiple MLLMs and benchmark datasets. 
 
+## 🔥 Highlights
+
+- 🔍 We find that MLLMs often know where to look, even if their answers are wrong.
+- 📸 We propose a training-free method to significantly enhance MLLMs' visual perception on small visual details.
+- 💪 Our method is flexible with different visual inputs formats, including high-resolution images (see below), multiple images, and video (to be explored in the future).
+
 ## 🛠️ Installation
 
 ### Setup Environment
