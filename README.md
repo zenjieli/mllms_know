@@ -160,14 +160,6 @@ If you find our paper and code useful for your research and applications, please
   journal={arXiv preprint arXiv:2502.17422},
   year={2025}
 }
-
-@inproceedings{zhang2025mllms,
-  title={{MLLM}s Know Where to Look: Training-free Perception of Small Visual Details with Multimodal {LLM}s},
-  author={Jiarui Zhang and Mahyar Khayatkhoei and Prateek Chhikara and Filip Ilievski},
-  booktitle={The Thirteenth International Conference on Learning Representations},
-  year={2025},
-  url={https://openreview.net/forum?id=DgaY5mDdmT}
-}
 ```
 
 ## 📄 License
